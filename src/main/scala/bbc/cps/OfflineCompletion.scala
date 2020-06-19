@@ -19,7 +19,7 @@ object OfflineCompletion {
     "LANGUAGE" -> "http://www.bbc.co.uk/ontologies/coreconcepts/language",
     "FORMAT" -> "http://www.bbc.co.uk/ontologies/cwork/format",
     "CONTRIBUTOR" -> "http://www.bbc.co.uk/ontologies/bbc/contributor",
-    "AUDIENCE" -> "audience")
+    "AUDIENCE_MOTIVATION" -> "audience")
 
   def passportContainsPredicate(passport: Passport): Map[String, Boolean] =
     predicates.foldLeft(Map.empty[String, Boolean]) { (accum, p) =>
@@ -51,16 +51,22 @@ object OfflineCompletion {
         }
       }
 
-  def results(summary: Map[String, Int]): Map[String, Double] =
-    (summary - "passports").transform((_, v) => v.toDouble / summary("passports").toDouble * 100)
+  def results(summary: Map[String, Int]) = {
+    val numberOfPassports = summary("passports")
+    val predicateCompleteness = (summary - "passports").transform((_, v) => v.toDouble / numberOfPassports.toDouble * 100)
+    (predicateCompleteness, numberOfPassports)
+  }
 
   def tidy(results: Map[String, Double]): Map[String, String] =
     results.map {case (key, value) => predicates.find(_._2 == key).get._1 -> {f"$value%1.1f" + "%"}}
 
   def main(args: Array[String]): Unit = {
     val (domain,filePath)= (args(0), args(1))
+
     // Use MAP of predicate counts for domain passports to create MAP of predicate completeness with formatted values
-    val completeness = OfflineCompletion.tidy (OfflineCompletion.results (OfflineCompletion.passportsSummary(filePath, domain)))
+    val predicateSummary = OfflineCompletion.passportsSummary(filePath, domain)
+    val (results, numberOfPassports) = OfflineCompletion.results(predicateSummary)
+    val completeness = OfflineCompletion.tidy(results)
 
     // Display formatted table of completeness results.
     if(completeness.isEmpty) {
@@ -68,6 +74,7 @@ object OfflineCompletion {
     }
     else {
       println(s"\nCompleteness for $domain")
+      println(s"Number of passports analyzed: $numberOfPassports")
       println(Tabulator.format(List("Predicate", "Completeness") :: completeness.map(x => List(x._1, x._2)).toList))
     }
   }
