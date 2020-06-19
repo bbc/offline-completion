@@ -40,6 +40,9 @@ object OfflineCompletion {
     Source.fromFile(filePath).getLines
       .toList
       .map(parse(_).extract[Passport])
+      .filterNot(a => a.locator match {
+        case Some(locator) => locator.contains("urn:bbc:cps:user:")
+        case None => true})
       .filter(_.home.contains(domain))
       .zipWithIndex
       .foldLeft(Map.empty[String, Int]) {
@@ -51,7 +54,7 @@ object OfflineCompletion {
         }
       }
 
-  def results(summary: Map[String, Int]) = {
+  def results(summary: Map[String, Int]): (Map[String, Double], Int) = {
     val numberOfPassports = summary("passports")
     val predicateCompleteness = (summary - "passports").transform((_, v) => v.toDouble / numberOfPassports.toDouble * 100)
     (predicateCompleteness, numberOfPassports)
