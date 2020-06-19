@@ -19,7 +19,8 @@ object OfflineCompletion {
     "LANGUAGE" -> "http://www.bbc.co.uk/ontologies/coreconcepts/language",
     "FORMAT" -> "http://www.bbc.co.uk/ontologies/cwork/format",
     "CONTRIBUTOR" -> "http://www.bbc.co.uk/ontologies/bbc/contributor",
-    "AUDIENCE_MOTIVATION" -> "audience")
+    "COMMISSIONED_FOR" -> "http://www.bbc.co.uk/ontologies/bbc/commissionedFor",
+    "SUITABLE_FOR" -> "http://www.bbc.co.uk/ontologies/bbc/suitableFor")
 
   def passportContainsPredicate(passport: Passport): Map[String, Boolean] =
     predicates.foldLeft(Map.empty[String, Boolean]) { (accum, p) =>
@@ -74,7 +75,7 @@ object OfflineCompletion {
     }
     else {
       println(s"\nCompleteness for $domain")
-      println(s"Number of passports analyzed: $numberOfPassports")
+      println(s"Number of passports analyzed:  $numberOfPassports")
       println(Tabulator.format(List("Predicate", "Completeness") :: completeness.map(x => List(x._1, x._2)).toList))
     }
   }
