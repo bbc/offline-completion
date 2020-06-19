@@ -9,7 +9,6 @@ object OfflineCompletion {
   implicit val formats = DefaultFormats
 
   val predicates = Map(
-    "MENTIONS" -> "http://www.bbc.co.uk/ontologies/creativework/mentions",
     "EDITORIAL_SENSITIVITY" -> "http://www.bbc.co.uk/ontologies/coreconcepts/editorialSensitivity",
     "ABOUT" -> "http://www.bbc.co.uk/ontologies/passport/predicate/About",
     "EDITORIAL_TONE" -> "http://www.bbc.co.uk/ontologies/coreconcepts/editorialTone",
