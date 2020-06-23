@@ -8,7 +8,7 @@ import scala.io.Source
 object OfflineCompletion {
   implicit val formats = DefaultFormats
 
-  val predicates = Map(
+  val predicateUrl = Map(
     "EDITORIAL_SENSITIVITY" -> "http://www.bbc.co.uk/ontologies/coreconcepts/editorialSensitivity",
     "ABOUT" -> "http://www.bbc.co.uk/ontologies/passport/predicate/About",
     "EDITORIAL_TONE" -> "http://www.bbc.co.uk/ontologies/coreconcepts/editorialTone",
@@ -21,64 +21,75 @@ object OfflineCompletion {
     "COMMISSIONED_FOR" -> "http://www.bbc.co.uk/ontologies/bbc/commissionedFor",
     "SUITABLE_FOR" -> "http://www.bbc.co.uk/ontologies/bbc/suitableFor")
 
+  case class SummaryCount(predicateCount: Map[String, Int], numberOfPassports: Int)
+
+  case class Predicate(pname:String, url:String)
+
+  def passportContainsPredicate(passport: Passport, predicate: Predicate): (String, Boolean) = predicate match {
+    case Predicate("LANGUAGE", url) => (url, passport.language.isDefined)
+    case Predicate(_, url) => passport.taggings match {
+      case Some(taggings) => (url, taggings.map(_.predicate).contains(url))
+      case None => (url, false)
+    }
+  }
+
   def passportContainsPredicate(passport: Passport): Map[String, Boolean] =
-    predicates.foldLeft(Map.empty[String, Boolean]) { (accum, p) =>
-        accum + {
-          if (p._1 == "LANGUAGE") {
-            p._2 -> passport.language.isDefined
-          }
-          else {
-            passport.taggings match {
-              case Some(taggings) => p._2 -> taggings.map(_.predicate).contains(p._2)
-              case None => p._2 -> false
-            }
-          }
-        }
+    predicateUrl.foldLeft(Map.empty[String, Boolean]) { (accum, predicateMapping) =>
+      accum + { passportContainsPredicate(passport, Predicate.tupled(predicateMapping)) }
     }
 
-  def passportsSummary(filePath: String, domain: String): Map[String, Int] =
-    Source.fromFile(filePath).getLines
+  def excludePassport(p:Passport): Boolean= p.locator match {
+    case Some(locator) => locator.contains("urn:bbc:cps:user:")
+    case None => true
+  }
+
+  def passportsSummary(filePath: String, domain: String): SummaryCount = {
+    val summary = Source.fromFile(filePath).getLines
       .toList
       .map(parse(_).extract[Passport])
-      .filterNot(a => a.locator match {
-        case Some(locator) => locator.contains("urn:bbc:cps:user:")
-        case None => true})
+      .filterNot(excludePassport(_))
       .filter(_.home.contains(domain))
       .zipWithIndex
-      .foldLeft(Map.empty[String, Int]) {
+      .foldLeft((Map.empty[String, Int], 0)) {
         (accum, passport) => {
-          accum + ("passports" -> (passport._2 + 1)) ++ // running total from index
-            passportContainsPredicate(passport._1).map {
-              case (k, v) => k -> ((if (v) 1 else 0) + accum.getOrElse(k, 0))
-            }
+          (accum._1 ++ passportContainsPredicate(passport._1).map {
+              case (k, v) => k -> ((if (v) 1 else 0) + accum._1.getOrElse(k, 0))
+            },
+            passport._2 + 1
+          )
         }
       }
 
-  def results(summary: Map[String, Int]): (Map[String, Double], Int) = {
-    val numberOfPassports = summary("passports")
-    val predicateCompleteness = (summary - "passports").transform((_, v) => v.toDouble / numberOfPassports.toDouble * 100)
-    (predicateCompleteness, numberOfPassports)
+    SummaryCount.tupled(summary)
   }
 
+  def calculate(x:Int, y:Int): Double = (x.toDouble / y.toDouble) * 100
+
+  def formatResult(x: Double): String = {f"$x%1.1f" + "%"}
+
+  def results(summary: SummaryCount): Map[String, Double] =
+     summary.predicateCount.transform((_, pCount) => calculate(pCount, summary.numberOfPassports))
+
   def tidy(results: Map[String, Double]): Map[String, String] =
-    results.map {case (key, value) => predicates.find(_._2 == key).get._1 -> {f"$value%1.1f" + "%"}}
+    results.map { case (key, value) => predicateUrl.find(_._2 == key).get._1 -> formatResult(value) }
+
+  def completeness(domain: String, filePath: String): (Map[String, String], Int) = {
+    val predicateSummary = passportsSummary(filePath, domain)
+    (tidy(results(predicateSummary)), predicateSummary.numberOfPassports)
+  }
 
   def main(args: Array[String]): Unit = {
-    val (domain,filePath)= (args(0), args(1))
-
-    // Use MAP of predicate counts for domain passports to create MAP of predicate completeness with formatted values
-    val predicateSummary = OfflineCompletion.passportsSummary(filePath, domain)
-    val (results, numberOfPassports) = OfflineCompletion.results(predicateSummary)
-    val completeness = OfflineCompletion.tidy(results)
+    val (domain, filePath) = (args(0), args(1))
+    val (passportCompleteness, numberOfPassports) = completeness(domain, filePath)
 
     // Display formatted table of completeness results.
-    if(completeness.isEmpty) {
+    if (passportCompleteness.isEmpty) {
       println(s"\nNo passports found where passport home = $domain")
     }
     else {
       println(s"\nCompleteness for $domain")
       println(s"Number of passports analyzed:  $numberOfPassports")
-      println(Tabulator.format(List("Predicate", "Completeness") :: completeness.map(x => List(x._1, x._2)).toList))
+      println(Tabulator.format(List("Predicate", "Completeness") :: passportCompleteness.map(x => List(x._1, x._2)).toList))
     }
   }
 }
