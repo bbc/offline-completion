@@ -1,28 +1,41 @@
 package steps
 
-import bbc.cps.OfflineCompletion.completeness
+import org.scalatest.MustMatchers._
+import bbc.cps.OfflineCompletion.reportCompleteness
 import cucumber.api.scala.{EN, ScalaDsl}
 
-class mainSteps extends ScalaDsl with EN {
+class CompletionSteps extends ScalaDsl with EN {
 
-  Given("""completion runs for matching home and no locators"""){ () =>
+  var (predicateCompleteness, numberOfPassports) = ("",0)
+
+  def testReportCompleteness(domain:String, filepath: String) = {
+    val result = reportCompleteness(domain, filepath)
+    predicateCompleteness = result._1.mkString(",")
+    numberOfPassports = result._2
+  }
+
+  Given("""passport data has been exported"""){ () =>
+  // TODO check file or just move to unit tests
+  }
+
+  When("""completion runs for that data""") { () =>
     val domain = "http://www.bbc.co.uk/ontologies/passport/home/News"
-    val filepath = "/Users/davieg01/Documents/data/homeNewsNoLocators.json"
-    val result = completeness(domain, filepath)
-    println(result)
+    val filepath = "/Users/davieg01/Documents/data/newsPassports.json"
+    testReportCompleteness(domain, filepath)
   }
 
-  Given("""completion runs for Test"""){ () =>
-    val domain = "http://www.bbc.co.uk/ontologies/passport/home/BBCThree"
-    val filepath = "/Users/davieg01/Documents/data/passportsTest.json"
-    val result = completeness(domain, filepath)
-    println(result)
+  Then("""^I receive the correct result$""") { () =>
+
+    val expectedPredcates: String =
+      "EDITORIAL_TONE -> 6.1,RELEVANT_TO -> 0.0,FORMAT -> 0.0,LANGUAGE -> 100.0,ABOUT -> 48.5," +
+        "CONTRIBUTOR -> 0.0,COMMISSIONED_FOR -> 0.0,EDITORIAL_SENSITIVITY -> 33.3,GENRE -> 0.0,SUITABLE_FOR -> 0.0"
+    val expectedNumberOfPassports = 33
+
+    predicateCompleteness mustBe expectedPredcates
+    numberOfPassports mustBe expectedNumberOfPassports
+
+    predicateCompleteness= _ // to improve
+    numberOfPassports = _ // to improve
   }
 
-  Given("""completion runs for Live"""){ () =>
-    val domain = "http://www.bbc.co.uk/ontologies/passport/home/BBCThree"
-    val filepath = "/Users/davieg01/Documents/data/passportsLive.json"
-    val result = completeness(domain, filepath)
-    println(result)
-  }
 }
