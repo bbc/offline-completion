@@ -6,7 +6,7 @@ The script takes two arguments - a domain and filepath.
 ### Run script example
 
 ```bash
-sbt run
+sbt run http://www.bbc.co.uk/ontologies/passport/home/News ./data.txt
 ```
 ### Run unit tests
 
