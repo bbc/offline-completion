@@ -7,6 +7,7 @@ import cucumber.api.scala.{EN, ScalaDsl}
 class CompletionSteps extends ScalaDsl with EN {
 
   var (predicateCompleteness, numberOfPassports) = ("",0)
+  var filepath = ""
 
   def testReportCompleteness(domain:String, filepath: String) = {
     val result = reportCompleteness(domain, filepath)
@@ -15,12 +16,11 @@ class CompletionSteps extends ScalaDsl with EN {
   }
 
   Given("""passport data has been exported"""){ () =>
-  // TODO check file or just move to unit tests
+     filepath = getClass.getResource("/newsPassports.txt").getPath()
   }
 
   When("""completion runs for that data""") { () =>
     val domain = "http://www.bbc.co.uk/ontologies/passport/home/News"
-    val filepath = getClass.getResource("/newsPassports.txt").getPath()
     testReportCompleteness(domain, filepath)
   }
 
