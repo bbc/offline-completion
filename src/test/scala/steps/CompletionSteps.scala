@@ -20,7 +20,7 @@ class CompletionSteps extends ScalaDsl with EN {
 
   When("""completion runs for that data""") { () =>
     val domain = "http://www.bbc.co.uk/ontologies/passport/home/News"
-    val filepath = "/Users/davieg01/Documents/data/newsPassports.json"
+    val filepath = "/Users/davieg01/Documents/data/newsPassports.txt"
     testReportCompleteness(domain, filepath)
   }
 
