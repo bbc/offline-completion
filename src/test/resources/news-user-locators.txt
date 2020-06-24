@@ -1,0 +1,7 @@
+{"_id":{"$oid":"5b15038ab257c20620adece0"},"passportId":"735189d8-400e-489b-bf4d-d7e6c30f241e","language":"en-gb","locator":"urn:bbc:cps:user:test1@bbc.co.uk","home":"http://www.bbc.co.uk/ontologies/passport/home/News"}
+{"_id":{"$oid":"5b15038ab257c20630adece0"},"passportId":"735189d8-400e-589b-bf4d-d7e6c30f241e","language":"en-gb","locator":"urn:bbc:cps:user:test2@bbc.co.uk","home":"http://www.bbc.co.uk/ontologies/passport/home/News"}
+{"_id":{"$oid":"5b15038ab257c20640adece0"},"passportId":"735189d8-400e-689b-bf4d-d7e6c30f241e","language":"en-gb","locator":"urn:bbc:cps:user:test3@bbc.co.uk","home":"http://www.bbc.co.uk/ontologies/passport/home/News"}
+{"_id":{"$oid":"5b15038ab257c20650adece0"},"passportId":"735189d8-400e-789b-bf4d-d7e6c30f241e","language":"en-gb","locator":"urn:bbc:cps:user:test4@bbc.co.uk","home":"http://www.bbc.co.uk/ontologies/passport/home/News"}
+{"_id":{"$oid":"5b15038ab257c20660adece0"},"passportId":"735189d8-400e-889b-bf4d-d7e6c30f241e","language":"en-gb","locator":"urn:bbc:cps:user:test5@bbc.co.uk","home":"http://www.bbc.co.uk/ontologies/passport/home/News"}
+{"_id":{"$oid":"5b15038ab257c20670adece0"},"passportId":"735189d8-400e-989b-bf4d-d7e6c30f241e","language":"en-gb","locator":"urn:bbc:cps:user:test6@bbc.co.uk","home":"http://www.bbc.co.uk/ontologies/passport/home/News"}
+{"_id":{"$oid":"5b15038ab257c20680adece0"},"passportId":"735189d8-400e-189b-bf4d-d7e6c30f241e","language":"en-gb","locator":"urn:bbc:cps:user:test7@bbc.co.uk","home":"http://www.bbc.co.uk/ontologies/passport/home/News"}

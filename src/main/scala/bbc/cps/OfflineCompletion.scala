@@ -1,5 +1,7 @@
 package bbc.cps
 
+import java.io.{File, FileNotFoundException}
+
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
 
@@ -16,7 +18,7 @@ object OfflineCompletion {
     "EDITORIAL_TONE" -> "http://www.bbc.co.uk/ontologies/coreconcepts/editorialTone",
     "GENRE" -> "http://www.bbc.co.uk/ontologies/bbc/genre",
     "LANGUAGE" -> "http://www.bbc.co.uk/ontologies/coreconcepts/language",
-    "FORMAT" -> "http://www.bbc.co.uk/ontologies/cwork/format",
+    "FORMAT" -> "http://www.bbc.co.uk/ontologies/creativework/format",
     "CONTRIBUTOR" -> "http://www.bbc.co.uk/ontologies/bbc/contributor",
     "COMMISSIONED_FOR" -> "http://www.bbc.co.uk/ontologies/bbc/commissionedFor",
     "SUITABLE_FOR" -> "http://www.bbc.co.uk/ontologies/bbc/suitableFor")
@@ -59,7 +61,6 @@ object OfflineCompletion {
           )
         }
       }
-
     SummaryCount.tupled(summary)
   }
 
@@ -74,6 +75,7 @@ object OfflineCompletion {
     results.map { case (key, value) => predicateUrl.find(_._2 == key).get._1 -> formatResult(value) }
 
   def reportCompleteness(domain: String, filePath: String): (Map[String, String], Int) = {
+    if(!new File(filePath).exists()) throw new FileNotFoundException(s"Could not find file $filePath");
     val predicateSummary = generatePassportSummary(filePath, domain)
     (tidyResults(makeResults(predicateSummary)), predicateSummary.numberOfPassports)
   }

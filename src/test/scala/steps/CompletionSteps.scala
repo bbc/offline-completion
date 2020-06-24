@@ -16,7 +16,7 @@ class CompletionSteps extends ScalaDsl with EN {
   }
 
   Given("""passport data has been exported"""){ () =>
-     filepath = getClass.getResource("/newsPassports.txt").getPath()
+     filepath = getClass.getResource("/news-passports.txt").getPath()
   }
 
   When("""completion runs for that data""") { () =>

@@ -10,7 +10,7 @@ libraryDependencies += "org.json4s" %% "json4s-jackson" % "3.7.0-M4"
 libraryDependencies ++= Seq (
   "org.json4s" %% "json4s-jackson" % "3.7.0-M4",
   "info.cukes" %% "cucumber-scala" % "1.2.5",
-  "org.scalatest" %% "scalatest" % "2.2.5" % "test"
+  "org.scalatest" %% "scalatest" % "3.0.8" % "test"
 )
 
 // Cucumber settings
