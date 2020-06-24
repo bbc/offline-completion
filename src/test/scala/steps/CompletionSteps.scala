@@ -20,7 +20,7 @@ class CompletionSteps extends ScalaDsl with EN {
 
   When("""completion runs for that data""") { () =>
     val domain = "http://www.bbc.co.uk/ontologies/passport/home/News"
-    val filepath = "/Users/davieg01/Documents/data/newsPassports.txt"
+    val filepath = getClass.getResource("/newsPassports.txt").getPath()
     testReportCompleteness(domain, filepath)
   }
 
@@ -33,9 +33,6 @@ class CompletionSteps extends ScalaDsl with EN {
 
     predicateCompleteness mustBe expectedPredcates
     numberOfPassports mustBe expectedNumberOfPassports
-
-    predicateCompleteness= _ // to improve
-    numberOfPassports = _ // to improve
   }
 
 }
