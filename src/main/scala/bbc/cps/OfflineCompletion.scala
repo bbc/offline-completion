@@ -47,7 +47,6 @@ object OfflineCompletion {
 
   private def generatePassportSummary(filePath: String, domain: String) = {
     val summary = Source.fromFile(filePath).getLines
-      .toList
       .map(parse(_).extract[Passport])
       .filterNot(excludePassport(_))
       .filter(_.home.contains(domain))
